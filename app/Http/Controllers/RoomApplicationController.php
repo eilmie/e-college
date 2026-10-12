@@ -12,7 +12,12 @@ class RoomApplicationController extends Controller
         $user = auth()->user();
         $semester = config('app.application_semester');
 
-        if ($user->program_level === 'diploma' && $user->current_semester === 1) {
+        if (! $user->gender || ! $user->program_level || ! $user->current_semester) {
+            return redirect()->route('dashboard')
+                ->withErrors(['profile' => 'Load your details from the student portal before applying.']);
+        }
+
+        if ($user->program_level === 'diploma' && (int) $user->current_semester === 1) {
             return redirect()->route('dashboard')
                 ->with('status', 'Semester 1 diploma students are placed automatically and do not need to apply.');
         }
@@ -25,13 +30,18 @@ class RoomApplicationController extends Controller
             return view('application.status', ['application' => $existing]);
         }
 
-        return view('application.create', ['semester' => $semester]);
+        return view('application.create', ['semester' => $semester, 'user' => $user]);
     }
 
     public function store(Request $request)
     {
         $user = auth()->user();
         $semester = config('app.application_semester');
+
+        if (! $user->gender || ! $user->program_level || ! $user->current_semester) {
+            return redirect()->route('dashboard')
+                ->withErrors(['profile' => 'Load your details from the student portal before applying.']);
+        }
 
         $request->validate([
             'medical_proof' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
@@ -54,10 +64,10 @@ class RoomApplicationController extends Controller
             'semester' => $semester,
             'medical_status' => $medicalStatus,
             'medical_proof_path' => $path,
+            'merit_score' => $user->merit_score,
             'status' => 'pending',
         ]);
 
-        return redirect()->route('application.create')
-            ->with('status', 'Application submitted. Your medical document will be reviewed by the admin.');
+        return redirect()->route('dashboard')->with('status', 'Application submitted.');
     }
 }

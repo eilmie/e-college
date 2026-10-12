@@ -1,33 +1,30 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Room Application — {{ $semester }}
-        </h2>
-    </x-slot>
+<x-student-layout>
+    <x-slot name="header">Room application, {{ $semester }}</x-slot>
 
-    <div class="py-12">
-        <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white p-6 shadow sm:rounded-lg">
-
-                @if (session('status'))
-                    <div class="mb-4 text-green-600">{{ session('status') }}</div>
-                @endif
-
-                <form method="POST" action="{{ route('application.store') }}" enctype="multipart/form-data">
-                    @csrf
-
-                    <x-input-label for="medical_proof" value="Medical proof (optional)" />
-                    <p class="text-sm text-gray-500 mb-2">
-                        Upload a doctor's or hospital's letter if you have a physical health condition that should be prioritized. PDF, JPG or PNG, max 5MB.
-                    </p>
-                    <input id="medical_proof" name="medical_proof" type="file" class="block w-full text-sm" />
-                    <x-input-error :messages="$errors->get('medical_proof')" class="mt-2" />
-
-                    <div class="flex items-center justify-end mt-6">
-                        <x-primary-button>Submit Application</x-primary-button>
-                    </div>
-                </form>
-            </div>
+    <div class="bg-white border border-slate-200 rounded-lg p-6 space-y-6">
+        <div>
+            <h2 class="font-semibold">Check your details</h2>
+            <dl class="mt-3 grid grid-cols-[10rem_1fr] gap-y-2 text-sm">
+                <dt class="text-slate-500">Name</dt><dd>{{ $user->name }}</dd>
+                <dt class="text-slate-500">Student ID</dt><dd>{{ $user->student_id }}</dd>
+                <dt class="text-slate-500">Programme</dt><dd>{{ ucfirst($user->program_level) }}, semester {{ $user->current_semester }}</dd>
+                <dt class="text-slate-500">Merit score</dt><dd>{{ $user->merit_score }}</dd>
+            </dl>
+            <p class="text-xs text-slate-500 mt-2">Your merit score is locked in when you submit.</p>
         </div>
+
+        <form method="POST" action="{{ route('application.store') }}" enctype="multipart/form-data" class="space-y-4">
+            @csrf
+            <div>
+                <label for="medical_proof" class="font-semibold text-sm">Medical proof (optional)</label>
+                <p class="text-sm text-slate-600 mb-2">Upload a letter from a doctor or hospital if you have a physical health condition. Leave this empty if you have nothing to declare. PDF, JPG or PNG, up to 5 MB.</p>
+                <input id="medical_proof" name="medical_proof" type="file" class="block w-full text-sm">
+            </div>
+
+            <div class="flex items-center gap-4">
+                <button class="bg-accent text-white px-4 py-2 rounded-md text-sm">Submit application</button>
+                <a href="{{ route('dashboard') }}" class="text-sm text-slate-600 underline">Cancel</a>
+            </div>
+        </form>
     </div>
-</x-app-layout>
+</x-student-layout>
