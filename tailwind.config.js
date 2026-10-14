@@ -11,15 +11,23 @@ export default {
 
     theme: {
     extend: {
-        colors: {
-            brand: {
-                DEFAULT: '#1E3A5F',
-                light: '#2C5282',
-            },
-            accent: '#0D9488',
+    colors: {
+        brand: {
+            DEFAULT: '#1E3A5F',
+            dark: '#162B47',
+            light: '#2C5282',
+            soft: '#EEF3F9',
+        },
+        accent: {
+            DEFAULT: '#0D9488',
+            dark: '#0F766E',
+        },
         },
         fontFamily: {
-            // keep your existing fontFamily block here if present
+            sans: ['Inter', ...defaultTheme.fontFamily.sans],
+        },
+        boxShadow: {
+            card: '0 1px 2px rgba(16, 24, 40, 0.05)',
         },
     },
 },

@@ -15,7 +15,7 @@
         ];
     @endphp
 
-    <div class="bg-white border border-slate-200 rounded-lg p-6">
+    <div class="card card-body">
         <dl class="grid grid-cols-[10rem_1fr] gap-y-3 text-sm">
             <dt class="text-slate-500">Status</dt>
             <dd><span class="inline-block px-2 py-0.5 rounded-full text-xs {{ $badge[$application->status] }}">{{ ucfirst($application->status) }}</span></dd>

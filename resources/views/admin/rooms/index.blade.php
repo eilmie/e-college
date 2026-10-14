@@ -2,12 +2,6 @@
     <x-slot name="header">Rooms</x-slot>
 
     <div class="space-y-6">
-        @if (session('status'))
-            <div class="rounded-md bg-emerald-50 text-emerald-700 text-sm px-4 py-3">{{ session('status') }}</div>
-        @endif
-        @if ($errors->any())
-            <div class="rounded-md bg-red-50 text-red-700 text-sm px-4 py-3">{{ $errors->first() }}</div>
-        @endif
 
         <div class="flex items-center justify-between">
             <div class="flex gap-2">
@@ -15,7 +9,7 @@
                 <a href="{{ route('admin.rooms.index', ['block' => 'Tun Sri Lanang A']) }}" class="px-3 py-1.5 rounded-md text-sm {{ $selectedBlock === 'Tun Sri Lanang A' ? 'bg-brand text-white' : 'bg-white border border-slate-200 text-slate-600' }}">Tun Sri Lanang A</a>
                 <a href="{{ route('admin.rooms.index', ['block' => 'Tun Sri Gemala A']) }}" class="px-3 py-1.5 rounded-md text-sm {{ $selectedBlock === 'Tun Sri Gemala A' ? 'bg-brand text-white' : 'bg-white border border-slate-200 text-slate-600' }}">Tun Sri Gemala A</a>
             </div>
-            <a href="{{ route('admin.rooms.create') }}" class="bg-accent text-white px-4 py-2 rounded-md text-sm">Add Room</a>
+            <a href="{{ route('admin.rooms.create') }}" class="btn-accent">Add Room</a>
         </div>
 
         <form method="GET" action="{{ route('admin.rooms.index') }}" class="flex gap-2">
@@ -23,12 +17,12 @@
                 <input type="hidden" name="block" value="{{ $selectedBlock }}">
             @endif
             <input type="text" name="search" value="{{ $search }}" placeholder="Search room number, e.g. 1101A" class="flex-1 border-slate-300 rounded-md text-sm">
-            <button class="bg-white border border-slate-300 px-4 py-2 rounded-md text-sm">Search</button>
+            <button class="btn-outline">Search</button>
         </form>
 
         <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
-            <table class="w-full text-sm table-fixed">
-                <thead class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
+            <table class="data-table">
+                <thead>
                     <tr>
                         <th class="w-40 text-left px-4 py-3">Block</th>
                         <th class="w-24 text-left px-4 py-3">Room</th>
@@ -39,9 +33,9 @@
                         <th class="text-left px-4 py-3">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
+                <tbody>
                     @foreach ($rooms as $room)
-                    <tr class="hover:bg-slate-50">
+                    <tr>
                         <td class="px-4 py-3 text-slate-700">{{ $room->block }}</td>
                         <td class="px-4 py-3 font-medium text-slate-900">{{ $room->room_number }}</td>
                         <td class="px-4 py-3 text-slate-600">{{ $room->floor }}</td>

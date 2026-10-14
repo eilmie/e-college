@@ -48,7 +48,7 @@
                             <p class="text-sm text-gray-600 mt-1">We load your programme, semester and merit score from the student portal.</p>
                             <form method="POST" action="{{ route('portal.fetch') }}" class="mt-3">
                                 @csrf
-                                <button class="bg-blue-600 text-white px-4 py-2 rounded text-sm">Load my details</button>
+                                <button class="btn-primary">Load my details</button>
                             </form>
                         @endif
                     </div>
@@ -70,7 +70,7 @@
                             <a href="{{ route('application.create') }}" class="inline-block mt-3 text-sm text-blue-600 underline">View application</a>
                         @elseif ($profileReady)
                             <p class="text-sm text-gray-600 mt-1">Submit your application. Upload medical proof if you have a health condition the college should consider.</p>
-                            <a href="{{ route('application.create') }}" class="inline-block mt-3 bg-blue-600 text-white px-4 py-2 rounded text-sm">Apply for a room</a>
+                            <a href="{{ route('application.create') }}" class="inline-block mt-3 btn-primary">Apply for a room</a>
                         @else
                             <p class="text-sm text-gray-500 mt-1">Load your details in step 1 first.</p>
                         @endif

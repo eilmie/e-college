@@ -70,18 +70,12 @@
     <!-- Main Content Area -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-4">
         
-        @if (session('status'))
-            <div class="rounded-md bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm px-4 py-3 shadow-sm">
-                {{ session('status') }}
-            </div>
+       @if (session('status'))
+            <div class="alert-success">{{ session('status') }}</div>
         @endif
-        
         @if ($errors->any())
-            <div class="rounded-md bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 shadow-sm">
-                {{ $errors->first() }}
-            </div>
+            <div class="alert-error">{{ $errors->first() }}</div>
         @endif
-
         {{ $slot }}
         
     </main>

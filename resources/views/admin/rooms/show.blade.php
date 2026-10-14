@@ -8,13 +8,6 @@
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            @if (session('status'))
-                <div class="text-green-600">{{ session('status') }}</div>
-            @endif
-            @if ($errors->any())
-                <div class="text-red-600">{{ $errors->first() }}</div>
-            @endif
-
             <div class="bg-white p-6 shadow sm:rounded-lg">
                 <p class="mb-4 text-sm text-gray-600">
                     Gender: {{ ucfirst($room->gender) }} · Capacity: {{ $occupants->count() }}/{{ $room->capacity }} · Status: {{ ucfirst($room->status) }}
@@ -47,7 +40,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded text-sm">Assign</button>
+                    <button class="btn-primary">Assign</button>
                 </form>
             </div>
             @endif
