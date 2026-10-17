@@ -28,4 +28,9 @@
     .alert { @apply rounded-md px-4 py-3 text-sm; }
     .alert-success { @apply alert bg-emerald-50 text-emerald-700; }
     .alert-error { @apply alert bg-red-50 text-red-700; }
+
+    .label { @apply block text-sm font-medium text-slate-700 mb-1; }
+    .input { @apply block w-full rounded-md border-slate-300 text-sm shadow-sm focus:border-brand focus:ring-brand; }
 }
+
+[x-cloak] { display: none !important; }

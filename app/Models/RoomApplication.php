@@ -19,4 +19,9 @@ public function allocation()
 {
     return $this->hasOne(Allocation::class);
 }
+
+public function detail()
+{
+    return $this->hasOne(ApplicationDetail::class);
+}
 }

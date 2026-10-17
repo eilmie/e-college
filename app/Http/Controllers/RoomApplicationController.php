@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\RoomApplication;
-use Illuminate\Http\Request;
+use App\Http\Requests\StoreRoomApplicationRequest;
+use App\Models\StudentPortalData;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 
 class RoomApplicationController extends Controller
 {
@@ -30,36 +33,60 @@ class RoomApplicationController extends Controller
             return view('application.status', ['application' => $existing]);
         }
 
-        return view('application.create', ['semester' => $semester, 'user' => $user]);
+        $portal = StudentPortalData::where('student_id', $user->student_id)->first();
+
+        return view('application.create', compact('user', 'semester', 'portal'));
     }
 
-    public function store(Request $request)
-    {
-        $user = auth()->user();
-        $semester = config('app.application_semester');
+    public function store(StoreRoomApplicationRequest $request)
+{
+    $user = auth()->user();
+    $semester = config('app.application_semester');
 
-        if (! $user->gender || ! $user->program_level || ! $user->current_semester) {
-            return redirect()->route('dashboard')
-                ->withErrors(['profile' => 'Load your details from the student portal before applying.']);
+    if (! $user->gender || ! $user->program_level || ! $user->current_semester) {
+        return redirect()->route('dashboard')
+            ->withErrors(['profile' => 'Load your details from the student portal before applying.']);
+    }
+
+    if (RoomApplication::where('user_id', $user->id)->where('semester', $semester)->exists()) {
+        return redirect()->route('application.create');
+    }
+
+    $details = Arr::except($request->validated(), ['medical_proof', 'declaration']);
+
+    foreach (['practical_next_semester', 'is_married', 'has_vehicle'] as $flag) {
+        $details[$flag] = $request->boolean($flag);
+    }
+
+    // Clear answers that belong to a "No" choice
+    if (! $details['practical_next_semester']) {
+        $details['practical_from'] = $details['practical_to'] = null;
+    }
+    if (! $details['is_married']) {
+        foreach (['spouse_name', 'spouse_occupation', 'spouse_income', 'spouse_phone'] as $field) {
+            $details[$field] = null;
         }
-
-        $request->validate([
-            'medical_proof' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
-        ]);
-
-        if (RoomApplication::where('user_id', $user->id)->where('semester', $semester)->exists()) {
-            return back()->withErrors(['medical_proof' => 'You have already applied for this semester.']);
+    }
+    if (! $details['has_vehicle']) {
+        foreach (['vehicle_type', 'vehicle_model', 'vehicle_plate'] as $field) {
+            $details[$field] = null;
         }
+    }
+    foreach (['dependants_private_uni', 'dependants_public_uni', 'dependants_secondary', 'dependants_primary', 'dependants_preschool', 'dependants_not_in_school'] as $field) {
+        $details[$field] = (int) ($details[$field] ?? 0);
+    }
+    $details['declared_at'] = now();
 
-        $path = null;
-        $medicalStatus = 'none';
+    $path = null;
+    $medicalStatus = 'none';
 
-        if ($request->hasFile('medical_proof')) {
-            $path = $request->file('medical_proof')->store('medical-proofs/'.$user->id, 'local');
-            $medicalStatus = 'pending';
-        }
+    if ($request->hasFile('medical_proof')) {
+        $path = $request->file('medical_proof')->store('medical-proofs/'.$user->id, 'local');
+        $medicalStatus = 'pending';
+    }
 
-        RoomApplication::create([
+    DB::transaction(function () use ($user, $semester, $path, $medicalStatus, $details) {
+        $application = RoomApplication::create([
             'user_id' => $user->id,
             'semester' => $semester,
             'medical_status' => $medicalStatus,
@@ -68,6 +95,9 @@ class RoomApplicationController extends Controller
             'status' => 'pending',
         ]);
 
-        return redirect()->route('dashboard')->with('status', 'Application submitted.');
-    }
+        $application->detail()->create($details);
+    });
+
+    return redirect()->route('dashboard')->with('status', 'Application submitted.');
+}
 }
