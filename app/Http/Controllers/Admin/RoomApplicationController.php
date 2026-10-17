@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\RoomApplication;
 use Illuminate\Http\Request;
 use App\Services\AllocationService;
+use App\Models\StudentPortalData;
 class RoomApplicationController extends Controller
 {
     public function runAllocation(AllocationService $service)
@@ -54,5 +55,14 @@ class RoomApplicationController extends Controller
         $request->validate(['has_record' => ['required', 'boolean']]);
         $application->update(['has_disciplinary_record' => $request->has_record]);
         return back()->with('status', 'Disciplinary record updated for '.$application->user->name);
+    }
+
+    public function show(RoomApplication $application)
+    {
+        $application->load(['user', 'detail']);
+
+        $portal = StudentPortalData::where('student_id', $application->user->student_id)->first();
+
+        return view('admin.applications.show', compact('application', 'portal'));
     }
 }

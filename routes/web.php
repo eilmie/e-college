@@ -40,6 +40,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('rooms', RoomController::class);
     Route::post('/rooms/{room}/assign', [RoomController::class, 'assignStudent'])->name('rooms.assign');
     Route::post('/allocations/{allocation}/remove', [RoomController::class, 'removeStudent'])->name('allocations.remove');
+    Route::get('/applications/{application}', [AdminRoomApplicationController::class, 'show'])->name('applications.show');
     
 });
 

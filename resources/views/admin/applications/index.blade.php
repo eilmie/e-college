@@ -17,12 +17,21 @@
         </div>
     </div>
 
-    <div class="flex justify-end">
-        <form method="POST" action="{{ route('admin.applications.run-allocation') }}">
-            @csrf
-            <button class="btn-primary">Run allocation for {{ $applications->count() }} applicants</button>
-        </form>
-    </div>
+    @php $pendingMedical = $applications->where('medical_status', 'pending')->count(); @endphp
+
+        @if ($pendingMedical > 0)
+            <div class="alert bg-amber-50 text-amber-700">
+                {{ $pendingMedical }} medical record(s) are waiting for review. Review them first, because only verified records count for priority.
+            </div>
+        @endif
+
+        <div class="flex justify-end">
+            <form method="POST" action="{{ route('admin.applications.run-allocation') }}"
+                @if ($pendingMedical > 0) onsubmit="return confirm('{{ $pendingMedical }} medical record(s) are still unreviewed. Run the allocation anyway?')" @endif>
+                @csrf
+                <button class="btn-primary">Run allocation for {{ $applications->count() }} applicants</button>
+            </form>
+        </div>
 
     <div class="card overflow-hidden">
         <table class="data-table">
@@ -41,7 +50,7 @@
                 <tr>
                     <td class="font-semibold text-slate-900">{{ $i + 1 }}</td>
                     <td>
-                        <p class="font-medium text-slate-900">{{ $app->user->name }}</p>
+                        <a href="{{ route('admin.applications.show', $app) }}" class="font-medium text-brand hover:underline">{{ $app->user->name }}</a>
                         <p class="text-xs text-slate-500">{{ $app->user->student_id }}</p>
                     </td>
                     <td>{{ $app->merit_score }}</td>
@@ -54,30 +63,21 @@
                                 'rejected' => 'badge-danger',
                             ][$app->medical_status];
                         @endphp
-                        <span class="{{ $medicalBadge }}">{{ ucfirst($app->medical_status) }}</span>
-
-                        @if ($app->medical_proof_path)
-                            <a href="{{ route('admin.applications.proof', $app) }}" target="_blank" class="ml-2 text-brand underline text-xs">View proof</a>
-                        @endif
-
-                        @if ($app->medical_proof_path && $app->medical_status === 'pending')
-                            <form method="POST" action="{{ route('admin.applications.medical', $app) }}" class="mt-1 flex gap-3 text-xs">
-                                @csrf
-                                <button name="decision" value="verified" class="text-emerald-700 underline">Verify</button>
-                                <button name="decision" value="rejected" class="text-red-600 underline">Reject</button>
-                            </form>
+                        <a href="{{ route('admin.applications.show', $app) }}#medical"
+                        class="{{ $medicalBadge }} hover:ring-2 hover:ring-slate-300" title="Open student details">
+                            {{ ucfirst($app->medical_status) }}
+                        </a>
+                        @if ($app->medical_status === 'pending')
+                            <span class="text-xs text-slate-500 ml-1">needs review</span>
                         @endif
                     </td>
                     <td>
-                        <form method="POST" action="{{ route('admin.applications.disciplinary', $app) }}" class="flex items-center gap-2">
-                            @csrf
-                            <input type="hidden" name="has_record" value="{{ $app->has_disciplinary_record ? 0 : 1 }}">
-                            <span class="{{ $app->has_disciplinary_record ? 'badge-danger' : 'badge-neutral' }}">
-                                {{ $app->has_disciplinary_record ? 'Has record' : 'Clean' }}
-                            </span>
-                            <button class="text-xs text-brand underline">{{ $app->has_disciplinary_record ? 'Clear' : 'Flag' }}</button>
-                        </form>
+                        <a href="{{ route('admin.applications.show', $app) }}#record"
+                        class="{{ $app->has_disciplinary_record ? 'badge-danger' : 'badge-neutral' }} hover:ring-2 hover:ring-slate-300" title="Open student details">
+                            {{ $app->has_disciplinary_record ? 'Has record' : 'Clean' }}
+                        </a>
                     </td>
+                    
                     <td class="text-slate-500">{{ $app->created_at->format('d M Y, H:i') }}</td>
                 </tr>
                 @endforeach
